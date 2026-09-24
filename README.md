@@ -16,7 +16,7 @@
   <a href="README.en.md"><img src="https://img.shields.io/badge/Docs-English-6b7280?style=flat-square" alt="English" /></a>
   <a href="https://github.com/FerryCorleone/crush-monitor"><img src="https://img.shields.io/badge/Based%20on-Crush%20Monitor-ff6b6b?style=flat-square" alt="Based on Crush Monitor" /></a>
   <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev"><img src="https://img.shields.io/badge/Powered%20by-Jev-7c3aed?style=flat-square" alt="Powered by Jev" /></a>
-  <img src="https://img.shields.io/github/stars/zhengge6/crush-monitor-app?style=flat-square" alt="Stars" />
+  <img src="https://img.shields.io/github/stars/zhengge6/crush-monitor-with-jev?style=flat-square" alt="Stars" />
 </p>
 
 
@@ -31,7 +31,7 @@
 
 ## 这是什么
 
-**好感度分析**（crush-monitor-app）是一款面向两人聊天的关系辅助工具，基于 Jev 做微信聊天情绪、意图与好感度分析。你导入聊天文本后，它会按选定的关系类型（暧昧 / 朋友同事 / 社交互动等）给出结构化解读：对方对你的好感信号、情绪与意图标签，以及可继续追问的对话式界面。
+**好感度分析**（crush-monitor-with-jev）是一款面向两人聊天的关系辅助工具，基于 Jev 做微信聊天情绪、意图与好感度分析。你导入聊天文本后，它会按选定的关系类型（暧昧 / 朋友同事 / 社交互动等）给出结构化解读：对方对你的好感信号、情绪与意图标签，以及可继续追问的对话式界面。
 
 它适合做参考，不适合替你做判断。模型看不到线下相处，也读不懂聊天之外的故事。
 
@@ -80,8 +80,8 @@
 需要 **Node.js 22.12+**。
 
 ```bash
-git clone https://github.com/zhengge6/crush-monitor-app.git
-cd crush-monitor-app
+git clone https://github.com/zhengge6/crush-monitor-with-jev.git
+cd crush-monitor-with-jev
 npm ci
 cp .env.example .env
 # 编辑 .env，至少填写 JEV_API_KEY

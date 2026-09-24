@@ -16,7 +16,7 @@
   <a href="README.md"><img src="https://img.shields.io/badge/Docs-中文-6b7280?style=flat-square" alt="Chinese" /></a>
   <a href="https://github.com/FerryCorleone/crush-monitor"><img src="https://img.shields.io/badge/Based%20on-Crush%20Monitor-ff6b6b?style=flat-square" alt="Based on Crush Monitor" /></a>
   <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev"><img src="https://img.shields.io/badge/Powered%20by-Jev-7c3aed?style=flat-square" alt="Powered by Jev" /></a>
-  <img src="https://img.shields.io/github/stars/zhengge6/crush-monitor-app?style=flat-square" alt="Stars" />
+  <img src="https://img.shields.io/github/stars/zhengge6/crush-monitor-with-jev?style=flat-square" alt="Stars" />
 </p>
 
 
@@ -31,7 +31,7 @@
 
 ## Overview
 
-**Affinity Analysis** (crush-monitor-app) is a WeChat chat affinity analyzer powered by **Jev**. Paste the transcript, choose a relation context (crush, friend/colleague, social interaction, …), and get a structured read: signals of how the other person may feel about you, emotion/intent tags, and a chat-style UI for follow-up questions.
+**Affinity Analysis** (crush-monitor-with-jev) is a WeChat chat affinity analyzer powered by **Jev**. Paste the transcript, choose a relation context (crush, friend/colleague, social interaction, …), and get a structured read: signals of how the other person may feel about you, emotion/intent tags, and a chat-style UI for follow-up questions.
 
 Treat the output as a reference, not a verdict. The model cannot see offline context.
 
@@ -69,8 +69,8 @@ Treat the output as a reference, not a verdict. The model cannot see offline con
 Requires **Node.js 22.12+**.
 
 ```bash
-git clone https://github.com/zhengge6/crush-monitor-app.git
-cd crush-monitor-app
+git clone https://github.com/zhengge6/crush-monitor-with-jev.git
+cd crush-monitor-with-jev
 npm ci
 cp .env.example .env
 # set JEV_API_KEY in .env
