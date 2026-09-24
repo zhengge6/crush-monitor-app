@@ -29,6 +29,7 @@ import {
   syncBodySchema,
 } from "./conversations";
 import { trialStore, TrialError, TRIAL_LIMIT } from "./trial";
+import { analyzeRecord } from "./replay-analysis";
 
 /** Bump to force clients to drop cached redeem sessions. */
 const CACHE_EPOCH = process.env.CACHE_EPOCH || "20260924-force-1";
@@ -261,6 +262,33 @@ app.get("/api/admin/conversations/:id", requireAdmin, async (req, res) => {
       return;
     }
     throw error;
+  }
+});
+
+app.post("/api/admin/conversations/:id/analyze", requireAdmin, async (req, res) => {
+  try {
+    const id = String(req.params.id || "");
+    const record = await conversationStore.getById(id);
+    if (!record) {
+      res.status(404).json({ error: "对话不存在" });
+      return;
+    }
+    const result = await analyzeRecord(record);
+    const saved = result.cached
+      ? record
+      : await conversationStore.saveAnalysis(id, {
+          lines: result.lines,
+          overview: result.overview,
+          affinity: result.affinity,
+        });
+    res.json({ cached: result.cached, conversation: saved });
+  } catch (error) {
+    if (error instanceof ConversationError) {
+      res.status(error.status).json({ error: error.message });
+      return;
+    }
+    const message = error instanceof Error ? error.message : "分析失败";
+    res.status(502).json({ error: message });
   }
 });
 

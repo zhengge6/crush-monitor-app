@@ -1,5 +1,7 @@
 /** Client auth + conversation sync helpers (Bearer token in localStorage). */
 
+import type { StoredLine } from "../shared/sync-snapshot";
+
 export type AuthUser = {
   id: string;
   username: string;
@@ -124,6 +126,7 @@ export type SyncPayload = {
     text: string;
     timestamp?: string | null;
   }>;
+  lines?: StoredLine[];
   overview?: {
     affinity?: {
       value?: number | null;
@@ -157,6 +160,22 @@ function sanitizeSyncPayload(payload: SyncPayload): SyncPayload {
           : String(m.timestamp).slice(0, 80),
     }))
     .filter((m) => m.text.trim().length > 0)
+    .slice(0, 5000);
+  const ids = new Set(messages.map((m) => m.id));
+  const lines = (payload.lines || [])
+    .filter((line) => line && ids.has(line.id))
+    .map((line) => ({
+      id: String(line.id).slice(0, 80),
+      skipped: line.skipped ? String(line.skipped).slice(0, 120) : undefined,
+      scoreValue:
+        typeof line.scoreValue === "number" && Number.isFinite(line.scoreValue)
+          ? line.scoreValue
+          : line.scoreValue === null
+            ? null
+            : undefined,
+      emotions: line.emotions,
+      intents: line.intents,
+    }))
     .slice(0, 5000);
   const cleanNum = (n: unknown): number | null | undefined => {
     if (n === null) return null;
@@ -193,6 +212,7 @@ function sanitizeSyncPayload(payload: SyncPayload): SyncPayload {
     otherName: (payload.otherName ?? "").slice(0, 64),
     affinity: cleanNum(payload.affinity) ?? null,
     messages,
+    lines,
     overview,
   };
 }
@@ -254,6 +274,16 @@ export async function adminList(opts?: {
   );
 }
 
+export async function adminAnalyze(id: string) {
+  return api<{
+    cached: boolean;
+    conversation: Awaited<ReturnType<typeof adminGet>>["conversation"];
+  }>(`/api/admin/conversations/${encodeURIComponent(id)}/analyze`, {
+    method: "POST",
+    body: "{}",
+  });
+}
+
 export async function adminGet(id: string) {
   return api<{
     conversation: AdminConversationMeta & {
@@ -263,6 +293,7 @@ export async function adminGet(id: string) {
         text: string;
         timestamp?: string | null;
       }>;
+      lines?: StoredLine[];
       overview?: SyncPayload["overview"];
       note?: string;
     };

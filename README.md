@@ -1,183 +1,130 @@
 # 好感度分析
 
 <p align="center">
-  <img src="docs/assets/logo.png" alt="好感度分析 Logo" width="96" />
+  <img src="docs/assets/logo.png" alt="好感度分析" width="96" />
 </p>
 
 <p align="center">
-  <b>把聊天记录变成可读的关系信号</b><br/>
-  导入微信聊天 · 识别关系类型 · 估计对方对你的好感度
+  <b>一段双人聊天，读成对方对你的好感信号。</b><br/>
+  贴进微信记录，选你是哪一边。情绪、意图、回复评级和好感度，标在气泡上。
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Node.js-%3E%3D22.12-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node" />
-  <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License" />
-  <a href="README.en.md"><img src="https://img.shields.io/badge/Docs-English-6b7280?style=flat-square" alt="English" /></a>
-  <a href="https://github.com/FerryCorleone/crush-monitor"><img src="https://img.shields.io/badge/Based%20on-Crush%20Monitor-ff6b6b?style=flat-square" alt="Based on Crush Monitor" /></a>
-  <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev"><img src="https://img.shields.io/badge/Powered%20by-Jev-7c3aed?style=flat-square" alt="Powered by Jev" /></a>
-  <img src="https://img.shields.io/github/stars/zhengge6/crush-monitor-with-jev?style=flat-square" alt="Stars" />
-</p>
-
-
-> **二开说明 / Attribution**  
-> 本项目基于 [@FerryCorleone](https://github.com/FerryCorleone) 的开源项目 [**Crush 好感监控器**](https://github.com/FerryCorleone/crush-monitor)（MIT）二次开发。  
-> 核心分析能力继续使用 [**Jev**](https://typesafe.ai/blog/introducing-system-one-models-and-jev)（TypeSafe）做结构化情绪 / 意图 / 好感判断。  
-> 原作版权归原作者所有；本仓库在保留 MIT 许可的前提下扩展了产品化 UI、试用兑换、账号与管理后台等能力。详见 [NOTICE](NOTICE)、[LICENSE](LICENSE)。
-
-**Topics:** `jev` · `jev-chat` · `typesafe` · `crush-monitor` · `wechat` · `chat-analysis` · `affinity` · `sentiment-analysis`
-
----
-
-## 这是什么
-
-**好感度分析**（crush-monitor-with-jev）是一款面向两人聊天的关系辅助工具，基于 Jev 做微信聊天情绪、意图与好感度分析。你导入聊天文本后，它会按选定的关系类型（暧昧 / 朋友同事 / 社交互动等）给出结构化解读：对方对你的好感信号、情绪与意图标签，以及可继续追问的对话式界面。
-
-它适合做参考，不适合替你做判断。模型看不到线下相处，也读不懂聊天之外的故事。
-
----
-
-## 产品截图
-
-<p align="center">
-  <img src="docs/assets/shot-home.png" alt="首页与关系选择" width="200" />
-  &nbsp;&nbsp;
-  <img src="docs/assets/shot-import.png" alt="导入与身份确认" width="200" />
-  &nbsp;&nbsp;
-  <img src="docs/assets/shot-demo.png" alt="孙宇晨×景甜示例分析" width="200" />
+  <a href="README.en.md">English</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/FerryCorleone/crush-monitor">基于 Crush Monitor</a>
+  &nbsp;·&nbsp;
+  <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a>
+  &nbsp;·&nbsp;
+  <a href="LICENSE">MIT</a>
 </p>
 
 <p align="center">
-  <sub>首页　　·　　导入确认　　·　　示例分析（孙宇晨 × 景甜）</sub>
+  <img src="docs/assets/shot-home.png" alt="选择关系类型" width="220" />
+  &nbsp;
+  <img src="docs/assets/shot-import.png" alt="确认哪边是你" width="220" />
+  &nbsp;
+  <img src="docs/assets/shot-demo.png" alt="气泡上的好感标签" width="220" />
 </p>
 
----
+<p align="center">
+  <sub>选关系 &nbsp;·&nbsp; 确认哪边是你 &nbsp;·&nbsp; 标签贴在原话上</sub>
+</p>
 
-## 核心能力
+它不写一篇「你们很般配」的作文。每一句对方的话给出情绪和意图，你的回复给出评级，整段对话合成一个好感度。数字是模型判断，不是对方的心意证明。
 
-- **微信式交互**  
-  关系选择、导入引导、分析结果都放在聊天气泡流里，降低「分析工具」的压迫感。
+## 贴进去就能看
 
-- **关系场景**  
-  支持暧昧 / 恋爱、朋友 / 同事、社交平台互动等场景；评分口径会随关系切换。
+微信电脑版多选复制，或改成一行一条：
 
-- **好感度解读**  
-  关注「对方对你的好感度」，并附带情绪、意图等彩色标签，方便快速扫读。
+```text
+我：今晚有空吗
+小明：有啊，想吃什么
+```
 
-- **灵活导入**  
-  支持长截图经任意 AI 整理成文字后粘贴，也支持直接粘贴聊天文本或一键示例。
+也认 QQ、WhatsApp 导出，以及带「下午」的微信时间。日期不会被当成第三个人。认不出两个人时，开始按钮保持灰色，页面写明原因。
 
-- **试用与兑换**  
-  设备级试玩次数；超额可用兑换码解锁。登录用于账号能力，不单独解锁分析次数。
+选好「哪边是你」之后：
 
-- **管理后台**  
-  管理员可查看同步上来的对话分析、管理兑换码，便于运营与质检。
+- 对方气泡下是情绪和意图
+- 你的气泡下是回复评级
+- 顶上是这一段的好感度，以及下一步建议
 
----
+关系场景可以换：暧昧、朋友同事、社交平台。评分口径跟着场景走，不把导师关心读成恋爱。
 
-## 快速开始
+## 跑起来
 
-需要 **Node.js 22.12+**。
+需要 Node.js 22.12 或更高。
 
 ```bash
-git clone https://github.com/zhengge6/crush-monitor-with-jev.git
-cd crush-monitor-with-jev
+git clone https://github.com/zhengge6/haogan.git
+cd haogan
 npm ci
 cp .env.example .env
-# 编辑 .env，至少填写 JEV_API_KEY
+```
+
+在 `.env` 里填 `JEV_API_KEY`（TypeSafe、Vercel AI Gateway 或 OpenRouter 的 Jev Key，三选一）。然后：
+
+```bash
 npm run build
 npm start
 ```
 
-浏览器打开 `http://127.0.0.1:3178/`。
+打开 `http://127.0.0.1:3178/`。改界面用 `npm run dev`，页面在 `5178`，接口仍走 `3178`。
 
-开发模式：
+Key 只放在服务端。聊天原文会发到你选的模型服务商，费用记在这把 Key 上。
 
-```bash
-npm run dev
-```
+## 自用和管理
 
----
+| 你要做的事 | 去哪 |
+| --- | --- |
+| 分析一段聊天 | `/` |
+| 看已经同步的对话、补标签、导出 | `/admin` |
+| 兑换码 | 后台里管理。`REDEEM_ENABLED=false` 时不拦分析次数 |
 
-## 环境变量
+后台可以：
 
-复制 `.env.example` 为 `.env`。常用项：
+- 按和前台一样的气泡查看已同步的标签。有缓存就不再打模型
+- 一条记录还没有标签时，一键分析并写入这条对话
+- 导出 `我：内容` 这样的文本，或一张从上到下的长截图
+
+同一段聊天如果交换过「哪边是你」，再换回来用本机上次的结果，不重复分析。
+
+## 边界
+
+- 只处理两个人的文字。图片和语音显示为占位，不参与打分。
+- 模型看不到线下相处、语气和表情。
+- 同步到服务器的记录可供管理员查看。不要贴高度敏感的内容。
+- 试玩次数和兑换只在你打开 `REDEEM_ENABLED` 之后生效。
+
+## 配置
 
 | 变量 | 说明 |
 | --- | --- |
-| `JEV_PROVIDER` | `typesafe` / `vercel` / `openrouter` |
-| `JEV_API_KEY` | 对应平台的 API Key（仅服务端，勿写入前端） |
+| `JEV_PROVIDER` | `typesafe`、`vercel` 或 `openrouter` |
+| `JEV_API_KEY` | 对应平台的 Key，仅服务端 |
 | `PORT` / `HOST` | 默认 `3178` / `0.0.0.0` |
-| `AUTH_ENABLED` | 是否启用账号体系 |
-| `TRIAL_LIMIT` | 每设备试玩次数 |
-| `REDEEM_ENABLED` | 是否启用兑换门槛 |
-| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | 管理后台账号 |
-| `CRUSH_DATA_DIR` | 数据目录（生产建议独立路径） |
+| `AUTH_ENABLED` | 账号登录 |
+| `REDEEM_ENABLED` | 是否用兑换码限制分析次数 |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | 后台账号，部署后请换成强密码 |
+| `CRUSH_DATA_DIR` | 对话和兑换数据目录 |
 
-不要把真实 `.env`、兑换码库或用户对话提交进 Git。
-
----
-
-## 使用流程
-
-1. 选择本次要分析的关系类型。  
-2. 用「有截图，开始导入」或「直接粘贴文字」导入聊天。  
-3. 在「哪边是你」里确认自己是哪一侧（未选时无法开始分析）。  
-4. 查看好感度与标签；需要时继续在输入框追问。  
-5. 试玩用尽后，按提示输入兑换码。
-
-管理后台路径：`/admin`（账号见你的 `.env`）。
-
----
+不要提交 `.env`、兑换码库或用户对话。生产部署见 `deploy/`。同步代码时不要覆盖服务器上的 `.env` 和 `data/`。仓库根目录的 `index.html` 必须继续指向 `/src/main.tsx`，不要用 `dist/index.html` 盖掉它。
 
 ## 技术栈
 
-| 层 | 技术 |
-| --- | --- |
-| 前端 | React 19 · TypeScript · Vite |
-| 后端 | Express 5 · Zod |
-| 模型 | Jev（TypeSafe / Vercel AI Gateway / OpenRouter） |
-| 数据 | 本地 JSON 存储（对话同步、兑换、试用） |
-| 部署 | systemd（见 `deploy/`） |
+React 19、TypeScript、Vite、Express 5、Zod。判断模型是 Jev。数据是本机 JSON。
 
 ```text
-src/          前端（聊天 UI、登录、分析状态）
-server/       API（分析、鉴权、兑换、对话同步、管理端）
-shared/       共享类型与评分规则
-docs/assets/  Logo 与产品截图
-deploy/       安装与服务单元
+src/          聊天界面、登录、分析状态
+server/       分析、账号、兑换、同步、后台
+shared/       解析、评分、同步快照
+docs/assets/  标志和截图
+deploy/       systemd 与安装脚本
 ```
-
----
-
-## 部署提示
-
-仓库内提供 `deploy/install.sh` 与 `deploy/crush-monitor.service`。生产环境请：
-
-1. 单独保管 `.env` 与 `data/`，部署时不要覆盖。  
-2. 反向代理到 `3178`，按需开启 HTTPS。  
-3. 部署后用强密码轮换 `ADMIN_PASSWORD`，并检查兑换码策略。
-
----
-
-## 说明与边界
-
-- 分析结果是模型推断，不是心理测量，更不是对方真实心意的证明。  
-- 聊天原文会发往你配置的模型服务商；用量由你的 Key 承担。  
-- 试玩与同步记录可能落在服务端，便于管理查看；请勿导入高度敏感内容。  
-- 本项目是 [FerryCorleone/crush-monitor](https://github.com/FerryCorleone/crush-monitor) 的 MIT 二开版本，感谢原作者 [@FerryCorleone](https://github.com/FerryCorleone) 与 Jev / TypeSafe。
-
----
 
 ## 致谢
 
-- 原作：[Crush 好感监控器](https://github.com/FerryCorleone/crush-monitor) by [@FerryCorleone](https://github.com/FerryCorleone)
-- 模型：[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) by [TypeSafe](https://typesafe.ai/)
-- 若你是从本仓库认识这个方向的，也请给原仓库一个 Star。
-
-## License
-
+本项目基于 [@FerryCorleone](https://github.com/FerryCorleone) 的 [Crush 好感监控器](https://github.com/FerryCorleone/crush-monitor)（MIT）二次开发。原作版权归原作者。模型是 [TypeSafe 的 Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev)。如果你是从这里知道这个方向的，也请给原仓库一个 Star。详见 [NOTICE](NOTICE)。
 
 [MIT](LICENSE)
-
-简体中文 · [English](README.en.md)

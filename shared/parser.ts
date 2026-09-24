@@ -1,8 +1,13 @@
 import { MAX_MESSAGES, MAX_TEXT_CHARS } from "./limits";
 import type { Message, Parsed } from "./types";
 const time =
-  "(?:\\d{4}[-/]\\d{1,2}[-/]\\d{1,2}\\s+)?\\d{1,2}:\\d{2}(?::\\d{2})?";
+  "(?:(?:\\d{4}[-/])?\\d{1,2}[-/]\\d{1,2}\\s+)?\\d{1,2}:\\d{2}(?::\\d{2})?";
 const header = new RegExp(`^(.{1,40}?)\\s+(${time})$`);
+const dayPart = "(?:上午|下午|晚上|早上|凌晨|中午)?\\s*";
+const cnClock = `${dayPart}\\d{1,2}:\\d{2}(?::\\d{2})?`;
+const cnDateLine = new RegExp(
+  `^\\d{4}年\\d{1,2}月\\d{1,2}日\\s+${cnClock}$`,
+);
 const bracket = new RegExp(`^\\[(${time})\\]\\s*(.{1,40}?)[：:]\\s*(.*)$`);
 // Keep dates as copied: 09/10 may mean September 10 or October 9.
 const qq =
@@ -23,9 +28,7 @@ export function parseChat(raw: string): {
   const lines = raw.replace(/\r\n?/g, "\n").split("\n");
   const messages: Parsed[] = [];
   const warnings: string[] = [];
-  const nativeFormat = lines.some((l) =>
-    /^\d{4}年\d{1,2}月\d{1,2}日\s+\d{1,2}:\d{2}/.test(l.trim()),
-  );
+  const nativeFormat = lines.some((l) => cnDateLine.test(l.trim()));
   const structured =
     nativeFormat ||
     lines.some((line) => {
@@ -47,11 +50,7 @@ export function parseChat(raw: string): {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const next = lines[i + 1]?.trim();
-    if (
-      line.trim() &&
-      next &&
-      /^\d{4}年\d{1,2}月\d{1,2}日\s+\d{1,2}:\d{2}(?::\d{2})?$/.test(next)
-    ) {
+    if (line.trim() && next && cnDateLine.test(next)) {
       push();
       current = { speaker: line.trim(), timestamp: next, text: "" };
       i++;

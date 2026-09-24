@@ -6,9 +6,28 @@
  * Server redeem usage is keyed by deviceId for quota only — chat transcripts
  * are never stored in a shared server-side conversation store.
  */
-import type { Message, Relation, LineResult, Overview } from "../shared/types";
+import {
+  RUBRIC,
+  type Message,
+  type Relation,
+  type LineResult,
+  type Overview,
+} from "../shared/types";
 import type { MemoryEvent } from "../shared/memory";
 export type Trend = { at: string; value: number | null; count: number };
+export type SideSnapshot = {
+  rubric: string;
+  messages: Message[];
+  self: string;
+  other: string;
+  relation: Relation;
+  lines: Record<string, LineResult>;
+  events: Record<string, MemoryEvent>;
+  overview: Overview | null;
+  trend: Trend[];
+  analyzedCount: number;
+  completed: boolean;
+};
 export type SavedConversation = {
   schema: 1;
   rubric: string;
@@ -22,7 +41,74 @@ export type SavedConversation = {
   trend: Trend[];
   analyzedCount: number;
   completed: boolean;
+  sides?: SideSnapshot[];
 };
+export function sameAssignment(
+  a: Message[],
+  b: Message[],
+  relationA: Relation,
+  relationB: Relation,
+) {
+  if (relationA !== relationB || a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    const x = a[i];
+    const y = b[i];
+    if (
+      x.id !== y.id ||
+      x.sender !== y.sender ||
+      x.text !== y.text ||
+      x.timestamp !== y.timestamp ||
+      x.kind !== y.kind
+    )
+      return false;
+  }
+  return true;
+}
+
+export function upsertSide(sides: SideSnapshot[], current: SavedConversation) {
+  if (!current.completed || !current.messages.length || current.rubric !== RUBRIC)
+    return sides;
+  const snap: SideSnapshot = {
+    rubric: current.rubric,
+    messages: current.messages,
+    self: current.self,
+    other: current.other,
+    relation: current.relation,
+    lines: current.lines,
+    events: current.events,
+    overview: current.overview,
+    trend: current.trend,
+    analyzedCount: current.analyzedCount,
+    completed: true,
+  };
+  const next = sides.slice();
+  const index = next.findIndex(
+    (side) =>
+      side.rubric === snap.rubric &&
+      sameAssignment(side.messages, snap.messages, side.relation, snap.relation),
+  );
+  if (index >= 0) next[index] = snap;
+  else next.push(snap);
+  return next.slice(-6);
+}
+
+export function findSide(
+  sides: SideSnapshot[],
+  messages: Message[],
+  relation: Relation,
+) {
+  for (let i = sides.length - 1; i >= 0; i--) {
+    const side = sides[i];
+    if (
+      side.completed &&
+      side.rubric === RUBRIC &&
+      sameAssignment(side.messages, messages, side.relation, relation)
+    )
+      return side;
+  }
+  return undefined;
+}
+
 let connection: Promise<IDBDatabase> | undefined;
 function db() {
   return (connection ??= new Promise<IDBDatabase>((resolve, reject) => {

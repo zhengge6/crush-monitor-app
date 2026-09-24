@@ -1,136 +1,126 @@
-# Affinity Analysis (好感度分析)
+# 好感度分析
 
 <p align="center">
-  <img src="docs/assets/logo.png" alt="Logo" width="96" />
+  <img src="docs/assets/logo.png" alt="好感度分析" width="96" />
 </p>
 
 <p align="center">
-  <b>Turn chat history into readable relationship signals</b><br/>
-  Import WeChat chats · pick a relation type · estimate how they feel about you
+  <b>A two-person chat, read as signals of how they feel about you.</b><br/>
+  Paste the transcript, mark which side is you. Emotion, intent, reply grade, and affinity sit on the bubbles.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Node.js-%3E%3D22.12-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node" />
-  <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License" />
-  <a href="README.md"><img src="https://img.shields.io/badge/Docs-中文-6b7280?style=flat-square" alt="Chinese" /></a>
-  <a href="https://github.com/FerryCorleone/crush-monitor"><img src="https://img.shields.io/badge/Based%20on-Crush%20Monitor-ff6b6b?style=flat-square" alt="Based on Crush Monitor" /></a>
-  <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev"><img src="https://img.shields.io/badge/Powered%20by-Jev-7c3aed?style=flat-square" alt="Powered by Jev" /></a>
-  <img src="https://img.shields.io/github/stars/zhengge6/crush-monitor-with-jev?style=flat-square" alt="Stars" />
-</p>
-
-
-> **Attribution**  
-> This project is a derivative of [**Crush Monitor**](https://github.com/FerryCorleone/crush-monitor) by [@FerryCorleone](https://github.com/FerryCorleone) (MIT).  
-> Analysis continues to use [**Jev**](https://typesafe.ai/blog/introducing-system-one-models-and-jev) from TypeSafe for structured emotion / intent / affinity judgments.  
-> Original copyright remains with the upstream authors. This repo adds product UI, trial/redeem, auth, and admin under the same MIT license. See [NOTICE](NOTICE) and [LICENSE](LICENSE).
-
-**Topics:** `jev` · `jev-chat` · `typesafe` · `crush-monitor` · `wechat` · `chat-analysis` · `affinity` · `sentiment-analysis`
-
----
-
-## Overview
-
-**Affinity Analysis** (crush-monitor-with-jev) is a WeChat chat affinity analyzer powered by **Jev**. Paste the transcript, choose a relation context (crush, friend/colleague, social interaction, …), and get a structured read: signals of how the other person may feel about you, emotion/intent tags, and a chat-style UI for follow-up questions.
-
-Treat the output as a reference, not a verdict. The model cannot see offline context.
-
----
-
-## Screenshots
-
-<p align="center">
-  <img src="docs/assets/shot-home.png" alt="Home" width="200" />
-  &nbsp;&nbsp;
-  <img src="docs/assets/shot-import.png" alt="Import" width="200" />
-  &nbsp;&nbsp;
-  <img src="docs/assets/shot-demo.png" alt="Demo analysis Sun Yuchen x Jing Tian" width="200" />
+  <a href="README.md">中文</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/FerryCorleone/crush-monitor">Based on Crush Monitor</a>
+  &nbsp;·&nbsp;
+  <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a>
+  &nbsp;·&nbsp;
+  <a href="LICENSE">MIT</a>
 </p>
 
 <p align="center">
-  <sub>Home　　·　　Import　　·　　Demo analysis (Sun Yuchen × Jing Tian)</sub>
+  <img src="docs/assets/shot-home.png" alt="Pick a relation" width="220" />
+  &nbsp;
+  <img src="docs/assets/shot-import.png" alt="Confirm which side is you" width="220" />
+  &nbsp;
+  <img src="docs/assets/shot-demo.png" alt="Tags on the original messages" width="220" />
 </p>
 
----
+<p align="center">
+  <sub>Relation &nbsp;·&nbsp; which side is you &nbsp;·&nbsp; tags on the original lines</sub>
+</p>
 
-## Features
+It does not write an essay about the relationship. Each message from them gets emotion and intent, each of yours gets a reply grade, and the thread becomes one affinity number. That number is a model judgment, not proof of how they feel.
 
-- **Chat-first UI** — relation picks, import tips, and results live in a WeChat-like bubble flow.
-- **Relation contexts** — crush / friends / social; scoring guidance shifts with the scene.
-- **Affinity read** — focuses on *their* favorability toward you, plus colorful emotion/intent tags.
-- **Flexible import** — long screenshots refined by any AI into text, direct paste, or one-tap demo.
-- **Trial + redeem** — per-device trial quota; redeem codes unlock more. Login alone does not unlock analysis.
-- **Admin console** — review synced analyses and manage redeem codes.
+## Paste and read
 
----
+A WeChat desktop copy works. So does one line per turn:
 
-## Quick start
+```text
+Me: free tonight?
+Alex: yes, what do you want to eat
+```
 
-Requires **Node.js 22.12+**.
+QQ and WhatsApp text exports work too. A clock time is not treated as a third person. If the paste is not two people, Start stays disabled and the screen says why.
+
+After you pick your side:
+
+- Their bubbles show emotion and intent
+- Yours show a reply grade
+- The header shows affinity for this stretch, and a next step
+
+Relation context changes the rubric: crush, friend or colleague, social chat. A teacher checking in is not scored as romance.
+
+## Run
+
+Node.js 22.12 or newer.
 
 ```bash
-git clone https://github.com/zhengge6/crush-monitor-with-jev.git
-cd crush-monitor-with-jev
+git clone https://github.com/zhengge6/haogan.git
+cd haogan
 npm ci
 cp .env.example .env
-# set JEV_API_KEY in .env
+```
+
+Put a `JEV_API_KEY` in `.env` (TypeSafe, Vercel AI Gateway, or OpenRouter). Then:
+
+```bash
 npm run build
 npm start
 ```
 
-Open `http://127.0.0.1:3178/`.
+Open `http://127.0.0.1:3178/`. `npm run dev` serves the UI on port `5178` and proxies the API to `3178`.
 
-Dev mode: `npm run dev`.
+The key stays on the server. Chat text is sent to the provider you picked, and usage is billed to that key.
 
----
+## Admin
 
-## Configuration
-
-| Variable | Purpose |
+| Task | Where |
 | --- | --- |
-| `JEV_PROVIDER` | `typesafe` / `vercel` / `openrouter` |
-| `JEV_API_KEY` | Server-only API key |
+| Analyze a chat | `/` |
+| Review synced chats, fill tags, export | `/admin` |
+| Redeem codes | Admin. Analysis is not gated while `REDEEM_ENABLED=false` |
+
+The admin view uses the same bubbles. A chat that already has tags is not sent through the model again. One without tags can be analyzed once and stored. Export is either `Me: text` lines or one tall screenshot.
+
+Swapping which side is you reuses a finished local result for that same transcript and relation.
+
+## Limits
+
+- Two people, text only. Images and voice stay as placeholders.
+- The model does not see tone of voice or anything that happened offline.
+- Synced transcripts are visible to the admin. Do not import highly sensitive chats.
+- Trial and redeem limits apply only after you set `REDEEM_ENABLED`.
+
+## Config
+
+| Variable | Role |
+| --- | --- |
+| `JEV_PROVIDER` | `typesafe`, `vercel`, or `openrouter` |
+| `JEV_API_KEY` | Server-only key |
 | `PORT` / `HOST` | Default `3178` / `0.0.0.0` |
-| `AUTH_ENABLED` | Account system |
-| `TRIAL_LIMIT` | Per-device trial runs |
-| `REDEEM_ENABLED` | Redeem gate |
-| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Admin console |
-| `CRUSH_DATA_DIR` | Data directory |
+| `AUTH_ENABLED` | Accounts |
+| `REDEEM_ENABLED` | Redeem-code gate |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Admin login. Rotate the password after deploy |
+| `CRUSH_DATA_DIR` | Where chats and codes are stored |
 
-Never commit real `.env`, redeem stores, or user chats.
-
----
+Do not commit `.env`, redeem stores, or user chats. Deploy notes are in `deploy/`. Keep the repo root `index.html` pointed at `/src/main.tsx`.
 
 ## Stack
 
-React 19 · TypeScript · Vite · Express 5 · Zod · Jev · local JSON storage · systemd (`deploy/`).
+React 19, TypeScript, Vite, Express 5, Zod. Judgments come from Jev. Storage is local JSON.
 
 ```text
-src/          frontend
-server/       API (analyze, auth, redeem, sync, admin)
-shared/       shared types & scoring
-docs/assets/  logo & screenshots
-deploy/       install + unit file
+src/          chat UI, login, analysis state
+server/       analyze, auth, redeem, sync, admin
+shared/       parse, scoring, sync snapshot
+docs/assets/  logo and screenshots
+deploy/       systemd unit and install script
 ```
 
----
+## Credit
 
-## Notes
-
-- Model output is inference, not psychology and not proof of someone’s feelings.
-- Chat text is sent to your configured provider; usage bills your key.
-- Trial / synced records may live on the server for admin review.
-- MIT derivative of [FerryCorleone/crush-monitor](https://github.com/FerryCorleone/crush-monitor). Thanks to [@FerryCorleone](https://github.com/FerryCorleone) and Jev / TypeSafe.
-
-## Credits
-
-- Upstream: [Crush Monitor](https://github.com/FerryCorleone/crush-monitor) by [@FerryCorleone](https://github.com/FerryCorleone)
-- Model: [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) by [TypeSafe](https://typesafe.ai/)
-- If this repo helped you discover the idea, please also star the original.
-
-## License
-
+Derivative of [Crush Monitor](https://github.com/FerryCorleone/crush-monitor) by [@FerryCorleone](https://github.com/FerryCorleone) (MIT). The model is [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) by TypeSafe. If this repo is where you found the idea, star the original too. See [NOTICE](NOTICE).
 
 [MIT](LICENSE)
-
-[简体中文](README.md) · English

@@ -37,7 +37,7 @@
     "vite": "^6.3.0"
   },
   "license": "MIT",
-  "description": "Local-first WeChat-style conversation analysis powered by your own Jev API key",
+  "description": "好感度分析：把双人聊天读成情绪、意图和好感信号。Powered by Jev.",
   "engines": {
     "node": ">=22.12.0"
   }

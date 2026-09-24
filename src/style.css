@@ -399,6 +399,7 @@ p {
 .reply-tag,
 .pending-tag,
 .intent-tag {
+  display: inline-flex;
   font-size: 10px;
   line-height: 14px;
   min-height: 22px;
@@ -1789,7 +1790,7 @@ details blockquote {
 }
 
 .import-parse-hint.warn {
-  color: var(--muted) !important;
+  color: #9a3412 !important;
 }
 
 .import-wizard-actions {
@@ -1984,6 +1985,69 @@ details blockquote {
   text-align: left;
   margin: 8px 0 12px;
 }
+.admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+  padding: 0 16px 8px;
+}
+
+.admin-actions .secondary,
+.admin-actions .primary {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 0;
+  padding: 0 14px;
+  border-radius: 999px;
+}
+
+.admin-cached,
+.admin-status {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+}
+
+.admin-status {
+  margin: 0;
+  padding: 0 16px 8px;
+}
+
+.admin-action-error {
+  padding: 0 16px 8px;
+}
+
+.admin-tag-line {
+  margin-top: 6px;
+  max-width: 100%;
+  padding: 4px 8px;
+  border-radius: 10px;
+  background: #fff4ee;
+  color: #9a3412;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.admin-tag-line.self {
+  background: #ecfdf3;
+  color: #14532d;
+}
+
+.admin-replay-note {
+  margin: 8px 0 16px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admin-panel {
+  padding-top: 4px;
+}
+
 .admin-app {
   width: 100%;
   max-width: none;
@@ -2191,7 +2255,7 @@ details blockquote {
   border-radius: 999px;
   border: none;
   background: var(--fill);
-  font-size: 15px;
+  font-size: 16px;
   color: var(--ink);
   outline: none;
 }

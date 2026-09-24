@@ -2,6 +2,8 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   loadConversation,
   saveConversation,
+  upsertSide,
+  findSide,
   loadCredentials,
   saveCredentials,
   loadRedeemSession,
@@ -9,6 +11,7 @@ import {
   saveRedeemSession,
   getDeviceId,
   type SavedConversation,
+  type SideSnapshot,
   type JevCredentials,
   type RedeemSession,
 } from "./storage";
@@ -38,6 +41,7 @@ import {
   AudioLines,
 } from "lucide-react";
 import { parseChat, toMessages, mergeMessages } from "../shared/parser";
+import { compactLines } from "../shared/sync-snapshot";
 import {
   RUBRIC,
   ACTIONS,
@@ -381,6 +385,7 @@ export default function App() {
       .then((saved) => {
         if (!live) return;
         if (saved?.schema === 1) {
+          sidesRef.current = saved.sides ?? [];
           setMessages(saved.messages);
           setSelf(saved.self);
           setOther(saved.other);
@@ -564,7 +569,8 @@ export default function App() {
 
   const pendingSave = useRef<SavedConversation | null>(null),
     saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null),
-    lastSavedMessages = useRef<Message[] | null>(null);
+    lastSavedMessages = useRef<Message[] | null>(null),
+    sidesRef = useRef<SideSnapshot[]>([]);
   const flushSave = () => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = null;
@@ -576,22 +582,25 @@ export default function App() {
   };
   useEffect(() => {
     if (!ready || storageError) return;
-    pendingSave.current = messages.length
-      ? {
-          schema: 1,
-          rubric: RUBRIC,
-          messages,
-          self,
-          other,
-          relation,
-          lines: a.lines,
-          events: a.events,
-          overview: a.overview,
-          trend: a.trend,
-          analyzedCount: a.analyzedCount,
-          completed: a.status === "complete",
-        }
-      : null;
+    if (messages.length) {
+      const draft: SavedConversation = {
+        schema: 1,
+        rubric: RUBRIC,
+        messages,
+        self,
+        other,
+        relation,
+        lines: a.lines,
+        events: a.events,
+        overview: a.overview,
+        trend: a.trend,
+        analyzedCount: a.analyzedCount,
+        completed: a.status === "complete",
+      };
+      sidesRef.current = upsertSide(sidesRef.current, draft);
+      draft.sides = sidesRef.current;
+      pendingSave.current = draft;
+    } else pendingSave.current = null;
     if (lastSavedMessages.current !== messages || a.status !== "loading") {
       lastSavedMessages.current = messages;
       flushSave();
@@ -648,6 +657,7 @@ export default function App() {
           text: m.text,
           timestamp: m.timestamp,
         })),
+        lines: compactLines(a.lines),
         overview: a.overview
           ? {
               affinity: {
@@ -675,6 +685,7 @@ export default function App() {
     self,
     other,
     a.overview,
+    a.lines,
     a.status,
   ]);
 
@@ -813,6 +824,7 @@ export default function App() {
     void saveConversation(null)
       .then(() => setStorageError(""))
       .catch(() => setStorageError("本机记录删除失败，请重试清空。"));
+    sidesRef.current = [];
     setMessages([]);
     setInput("");
     setSelf("");
@@ -827,13 +839,22 @@ export default function App() {
   }
   const names = [...new Set(parsed.map((x) => x.speaker))];
   const pasteParsed = pasteDraft.trim() ? parseChat(pasteDraft) : null;
+  const pasteSpeakers = pasteParsed
+    ? [...new Set(pasteParsed.messages.map((m) => m.speaker))]
+    : [];
+  const pasteNamed = pasteSpeakers.filter((n) => n !== "未分配");
   const pasteHint = pasteParsed
     ? {
-        ok: pasteParsed.messages.length > 0,
+        ok:
+          pasteParsed.messages.length > 0 &&
+          !pasteSpeakers.includes("未分配") &&
+          pasteNamed.length >= 1 &&
+          pasteNamed.length <= 2,
         count: pasteParsed.messages.length,
-        speakers: new Set(pasteParsed.messages.map((m) => m.speaker)).size,
+        speakers: pasteNamed.length,
+        unassigned: pasteSpeakers.includes("未分配"),
       }
-    : { ok: false, count: 0, speakers: 0 };
+    : { ok: false, count: 0, speakers: 0, unassigned: false };
   const chosen = messages.find((m) => m.id === detail),
     result = detail ? a.lines[detail] : undefined;
   const activeProvider =
@@ -1451,7 +1472,11 @@ export default function App() {
                   </p>
                 ) : (
                   <p className="import-parse-hint warn">
-                    还没识别到消息，试试「我：内容」格式
+                    {pasteHint.unassigned
+                      ? "没认出发送人。改成一行一条：「我：内容」「对方：内容」。"
+                      : pasteHint.speakers > 2
+                        ? `认出了 ${pasteHint.speakers} 个人，这里只分析两个人的聊天。`
+                        : "还没识别到消息，试试「我：内容」格式"}
                   </p>
                 )
               ) : null}
@@ -1516,7 +1541,7 @@ export default function App() {
                   </span>
                 </button>
               ))}
-            {names.length === 1 && (
+            {names.length === 1 && names[0] !== "未分配" && (
               <button
                 type="button"
                 className={role === "__self_absent__" ? "selected" : ""}
@@ -1542,11 +1567,15 @@ export default function App() {
               }}
             />
           </label>
-          {(names.length > 2 || names.includes("未分配")) && (
+          {names.includes("未分配") ? (
             <p className="error">
-              请保留两个人的聊天，可改成「我：内容」「对方：内容」。
+              没认出发送人，所以「开始分析」是灰的。把预览改成一行一条：「我：内容」「对方：内容」。
             </p>
-          )}
+          ) : names.length > 2 ? (
+            <p className="error">
+              {`认出了 ${names.length} 个名字（${names.join("、")}），超过两个人，按钮不会亮。请改成「我：内容」「对方：内容」。`}
+            </p>
+          ) : null}
           <button
             className="primary"
             disabled={
@@ -1904,12 +1933,35 @@ export default function App() {
                 sender:
                   m.sender === "self" ? ("other" as const) : ("self" as const),
               }));
-              setSelf(other);
-              setOther(self === "__self_absent__" ? "我" : self);
-              setMessages(ms);
+              const current: SavedConversation = {
+                schema: 1,
+                rubric: RUBRIC,
+                messages,
+                self,
+                other,
+                relation,
+                lines: a.lines,
+                events: a.events,
+                overview: a.overview,
+                trend: a.trend,
+                analyzedCount: a.analyzedCount,
+                completed: a.status === "complete",
+              };
+              sidesRef.current = upsertSide(sidesRef.current, current);
+              const hit = findSide(sidesRef.current, ms, relation);
+              const nextSelf = other;
+              const nextOther = self === "__self_absent__" ? "我" : self;
+              setSelf(hit?.self || nextSelf);
+              setOther(hit?.other || nextOther);
+              setMessages(hit?.messages || ms);
+              setSettings(false);
+              if (hit) {
+                a.restore({ schema: 1, ...hit, sides: sidesRef.current });
+                setNotice("这个身份之前分析过，已直接用缓存。");
+                return;
+              }
               a.reset();
               a.run(ms, relation);
-              setSettings(false);
             }}
           >
             交换双方身份

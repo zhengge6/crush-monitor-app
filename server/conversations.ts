@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile, rename } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
+import type { StoredLine } from "../shared/sync-snapshot";
 
 const MAX_MESSAGES_TEXT_BYTES = 400 * 1024; // ~400kb
 
@@ -40,6 +41,18 @@ const finiteNullableNumber = z.preprocess((v) => {
   return undefined;
 }, z.number().nullable().optional());
 
+const probMap = z
+  .record(z.string().max(40), z.number().min(0).max(1))
+  .optional();
+
+const storedLineSchema = z.object({
+  id: z.string().min(1).max(80),
+  skipped: z.string().max(120).optional(),
+  scoreValue: finiteNullableNumber,
+  emotions: probMap,
+  intents: probMap,
+});
+
 const overviewSchema = z
   .object({
     affinity: z
@@ -72,6 +85,7 @@ export const syncBodySchema = z.object({
   otherName: z.string().max(64).optional().default(""),
   affinity: finiteNullableNumber,
   messages: z.array(messageSchema).min(1).max(5000),
+  lines: z.array(storedLineSchema).max(5000).optional(),
   overview: overviewSchema,
   note: z.string().max(2000).optional(),
   source: z.enum(["trial", "user"]).optional(),
@@ -99,6 +113,7 @@ export type ConversationRecord = {
   messageCount: number;
   affinity: number | null;
   messages: ConversationMessage[];
+  lines?: StoredLine[];
   overview?: {
     affinity?: {
       value?: number | null;
@@ -263,6 +278,9 @@ export class ConversationStore {
       messageCount: messages.length,
       affinity: typeof affinity === "number" ? affinity : null,
       messages,
+      lines: (body.lines || []).filter((line) =>
+        messages.some((m) => m.id === line.id),
+      ),
       overview: body.overview
         ? {
             affinity: body.overview.affinity,
@@ -300,6 +318,33 @@ export class ConversationStore {
     }
     await this.persistIndex(index);
     return { id };
+  }
+
+  async saveAnalysis(
+    id: string,
+    patch: {
+      lines: StoredLine[];
+      overview?: ConversationRecord["overview"];
+      affinity: number | null;
+    },
+  ) {
+    const record = await this.getById(id);
+    if (!record) throw new ConversationError(404, "对话不存在");
+    const now = new Date().toISOString();
+    const ids = new Set(record.messages.map((m) => m.id));
+    record.lines = patch.lines.filter((line) => ids.has(line.id));
+    record.overview = patch.overview ?? record.overview;
+    record.affinity = patch.affinity;
+    record.updatedAt = now;
+    await this.writeRecord(record);
+    const index = await this.loadIndex();
+    const meta = index.byId[id];
+    if (meta) {
+      meta.updatedAt = now;
+      meta.affinity = patch.affinity;
+      await this.persistIndex(index);
+    }
+    return record;
   }
 
   async listForAdmin(opts: {

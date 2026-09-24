@@ -71,6 +71,28 @@ test("manual transcripts accept English names; unlabelled text never invents sen
   );
 });
 
+test("WeChat copies with 下午 or a month-day stamp still resolve to two people", () => {
+  const afternoon = parseChat(
+    "小明\n2026年9月24日 下午7:26\n今晚吃饭吗\n我\n2026年9月24日 下午7:27\n好",
+  );
+  assert.deepEqual(
+    afternoon.messages.map((m) => m.speaker),
+    ["小明", "我"],
+  );
+  assert.equal(afternoon.messages[0].timestamp, "2026年9月24日 下午7:26");
+  const shortDate = parseChat(
+    "小明 9/24 19:26\n今晚吃饭吗\n我 9/25 19:27\n好",
+  );
+  assert.deepEqual(
+    shortDate.messages.map((m) => [m.speaker, m.timestamp]),
+    [
+      ["小明", "9/24 19:26"],
+      ["我", "9/25 19:27"],
+    ],
+  );
+  assert.deepEqual(shortDate.warnings, []);
+});
+
 test("existing bracket and name-time transcripts preserve colon-bearing bodies", () => {
   const result = parseChat(
     "[2026-09-17 19:26] Alex: Hi\nNote: hello\n[2026-09-17 19:27] Me: Yes",

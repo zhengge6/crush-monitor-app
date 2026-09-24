@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, RefreshCw, X } from "lucide-react";
 import {
+  adminAnalyze,
   adminGet,
   adminList,
   adminListCodes,
@@ -14,13 +15,299 @@ import {
   type AdminConversationMeta,
   type AuthUser,
 } from "./auth";
-import { RELATIONS, type Relation } from "../shared/types";
+import { exportDialogue } from "../shared/export-chat";
+import { downloadLongShot, downloadText } from "./export-shot";
+import { topEmotions } from "../shared/labels";
+import { topIntents } from "../shared/intents";
+import { replyRating } from "../shared/ratings";
+import { ACTIONS, RELATIONS, STAGES, type Relation } from "../shared/types";
 
 type Detail = Awaited<ReturnType<typeof adminGet>>["conversation"];
 type Tab = "chats" | "codes";
 
 function relationLabel(r: string) {
   return RELATIONS[r as Relation] || r;
+}
+
+const mediaText =
+  /^\[(?:图片|语音|视频|动画表情|表情包|文件|不支持的消息|撤回消息)\]$/;
+
+function tagLabel(
+  line: NonNullable<Detail["lines"]>[number] | undefined,
+  sender: "self" | "other",
+) {
+  if (!line) return "";
+  if (line.skipped) return line.skipped;
+  if (sender === "other") {
+    const emotions = topEmotions(line.emotions).map(
+      (item) => `${item.label} ${item.percent}`,
+    );
+    const intents = topIntents(line.intents).map(
+      (item) => `${item.label} ${item.percent}`,
+    );
+    return [
+      emotions.length ? `情绪 ${emotions.join(" ")}` : "",
+      intents.length ? `意图 ${intents.join(" ")}` : "",
+    ]
+      .filter(Boolean)
+      .join("  ");
+  }
+  const rating = replyRating(line.scoreValue);
+  if (rating) return `回复评级 ${rating.label}`;
+  return typeof line.scoreValue === "number" ? "回复评级 待判断" : "";
+}
+
+function messageCovered(
+  message: Detail["messages"][number],
+  line: NonNullable<Detail["lines"]>[number] | undefined,
+) {
+  if (mediaText.test(message.text.trim())) return true;
+  if (!line) return false;
+  if (line.skipped) return true;
+  if (message.sender === "other") return Boolean(line.emotions || line.intents);
+  return typeof line.scoreValue === "number";
+}
+
+function HeartMark() {
+  return (
+    <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
+      <circle cx="16" cy="16" r="16" fill="#FF6A3D" />
+      <path
+        d="M16 23.5S7.2 17.8 9 12.2c1.8-5.2 7-2.6 7 0 0-2.6 5.2-5.2 7 0 1.8 5.6-7 11.3-7 11.3"
+        fill="#fff"
+      />
+    </svg>
+  );
+}
+
+function Replay({
+  detail,
+  onBack,
+  onUpdate,
+}: {
+  detail: Detail;
+  onBack: () => void;
+  onUpdate: (detail: Detail) => void;
+}) {
+  const [busy, setBusy] = useState<"analyze" | "shot" | "">("");
+  const [err, setErr] = useState("");
+  const [note, setNote] = useState("");
+  const lines = new Map((detail.lines || []).map((line) => [line.id, line]));
+  const missing = detail.messages.some(
+    (message) => !messageCovered(message, lines.get(message.id)),
+  );
+  const fileBase = (detail.otherName || detail.username || "对话").replace(
+    /[\\/:*?"<>|]/g,
+    "_",
+  );
+  const action = detail.overview?.action
+    ? ACTIONS[detail.overview.action]
+    : undefined;
+  const stage = detail.overview?.stage
+    ? STAGES[detail.overview.stage] || detail.overview.stage
+    : "";
+  return (
+    <main className="app">
+      <div className="workspace">
+        <header className="grok-head">
+          <button
+            type="button"
+            className="float-circle"
+            aria-label="返回列表"
+            onClick={onBack}
+          >
+            <ChevronLeft size={22} strokeWidth={2.25} />
+          </button>
+          <div className="title-pill" aria-label="已同步的分析">
+            <span className="title-logo">
+              <HeartMark />
+            </span>
+            <span className="title-text">
+              {detail.otherName || detail.username || "好感度分析"}
+            </span>
+          </div>
+          <div className="head-right">
+            <span className="auth-chip">{relationLabel(detail.relation)}</span>
+          </div>
+        </header>
+        <div className="admin-actions">
+          <button
+            type="button"
+            className="secondary"
+            disabled={busy !== ""}
+            onClick={() => {
+              setErr("");
+              downloadText(
+                `${fileBase}.txt`,
+                exportDialogue(detail.messages, detail.selfName, detail.otherName),
+              );
+            }}
+          >
+            导出文本
+          </button>
+          <button
+            type="button"
+            className="secondary"
+            disabled={busy !== ""}
+            onClick={() => {
+              setBusy("shot");
+              setErr("");
+              setNote("");
+              void downloadLongShot(
+                `${fileBase}.png`,
+                detail.otherName || "好感度分析",
+                detail.affinity,
+                detail.messages.map((message) => ({
+                  sender: message.sender,
+                  text: message.text,
+                  timestamp: message.timestamp,
+                  tag: tagLabel(lines.get(message.id), message.sender),
+                })),
+              )
+                .catch((e: Error) => setErr(e.message || "长截图失败"))
+                .finally(() => setBusy(""));
+            }}
+          >
+            {busy === "shot" ? "正在生成…" : "导出长截图"}
+          </button>
+          {missing ? (
+            <button
+              type="button"
+              className="primary"
+              disabled={busy !== ""}
+              onClick={() => {
+                setBusy("analyze");
+                setErr("");
+                setNote("");
+                void adminAnalyze(detail.id)
+                  .then((body) => {
+                    onUpdate(body.conversation);
+                    setNote(
+                      body.cached
+                        ? "标签已在缓存里，没有重新分析。"
+                        : "分析已写入这条对话。之后打开直接看标签。",
+                    );
+                  })
+                  .catch((e: Error) => setErr(e.message || "分析失败"))
+                  .finally(() => setBusy(""));
+              }}
+            >
+              {busy === "analyze" ? "分析中，请稍候…" : "分析并缓存"}
+            </button>
+          ) : (
+            <span className="admin-cached">标签已缓存</span>
+          )}
+        </div>
+        {busy === "analyze" && (
+          <p className="admin-status" role="status">
+            正在逐句分析。长对话可能要几分钟，完成后会存进这条记录。
+          </p>
+        )}
+        {note && (
+          <p className="admin-status" role="status">
+            {note}
+          </p>
+        )}
+        {err && (
+          <p className="error admin-action-error" role="alert">
+            {err}
+          </p>
+        )}
+        {detail.affinity != null && (
+          <div className="affinity-banner">
+            <span>对方对你的好感度</span>
+            <strong>{detail.affinity}</strong>
+            {stage && <small>{stage}</small>}
+          </div>
+        )}
+        <div className="chat-scroll">
+          <div className="timestamp">
+            {detail.selfName || "我"} / {detail.otherName || "对方"} ·{" "}
+            {formatTime(detail.updatedAt)} · {detail.username}
+          </div>
+          {!lines.size && (
+            <p className="admin-replay-note">
+              这条是旧同步，只有聊天原文。前端再完成一次分析后，情绪、意图和回复评级会一起出现在这里，不需要在后台重跑。
+            </p>
+          )}
+          {detail.messages.map((m, i) => {
+            const line = lines.get(m.id);
+            const prev = detail.messages[i - 1];
+            return (
+              <div key={m.id} className={`message ${m.sender}`}>
+                {m.timestamp && m.timestamp !== prev?.timestamp && (
+                  <div className="timestamp">
+                    {m.timestamp.replace(/^\d{4}年/, "")}
+                  </div>
+                )}
+                <div className="message-row">
+                  <div className="message-content">
+                    <div className="bubble">{m.text}</div>
+                    {tagLabel(line, m.sender) && (
+                      <div className={`admin-tag-line ${m.sender}`}>
+                        {tagLabel(line, m.sender)}
+                      </div>
+                    )}
+                    {line && (
+                      <div className={`message-tags ${m.sender}`}>
+                        {line.skipped ? (
+                          <span className="pending-tag">{line.skipped}</span>
+                        ) : m.sender === "other" ? (
+                          <>
+                            <div className="analysis-row emotion-row">
+                              <span className="analysis-row-label">情绪</span>
+                              {topEmotions(line.emotions).map((emotion) => (
+                                <span
+                                  key={emotion.key}
+                                  className={`emotion-tag emotion-${emotion.key}`}
+                                >
+                                  <span>{emotion.label}</span>
+                                  <b>{emotion.percent}</b>
+                                </span>
+                              ))}
+                            </div>
+                            <div className="analysis-row intent-row">
+                              <span className="analysis-row-label">意图</span>
+                              {topIntents(line.intents).map((intent) => (
+                                <span
+                                  key={intent.key}
+                                  className={`intent-tag intent-${intent.key}`}
+                                >
+                                  <span>{intent.label}</span>
+                                  <b>{intent.percent}</b>
+                                </span>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <span className="reply-tag">
+                            <span>回复评级：</span>
+                            <b>
+                              {replyRating(line.scoreValue)?.label ?? "待判断"}
+                            </b>
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="bottom-chrome">
+          {action && (
+            <div className="subtle-hint">
+              <span>{action.label}</span>
+            </div>
+          )}
+          <div className="status-strip" role="status">
+            <span className="completed">已同步的分析结果，后台不再调用模型</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }
 
 function formatTime(iso: string) {
@@ -284,84 +571,29 @@ export default function AdminApp() {
   }
 
   if (detail) {
-    const dims = detail.overview?.dimensions || [];
     return (
-      <main className="app admin-app">
-        <header className="admin-head">
-          <button
-            type="button"
-            className="float-circle"
-            aria-label="返回列表"
-            onClick={() => setDetail(null)}
-          >
-            <ChevronLeft size={22} strokeWidth={2.25} />
-          </button>
-          <div className="admin-head-title">
-            <strong>{detail.username}</strong>
-            <span>
-              {relationLabel(detail.relation)} · {detail.messageCount} 条
-            </span>
-          </div>
-          <a className="admin-text-link" href="/">
-            分析
-          </a>
-        </header>
-        <div className="admin-summary">
-          <div className="admin-summary-row">
-            <span>{formatTime(detail.updatedAt)}</span>
-            <span>
-              {detail.selfName || "我"} / {detail.otherName || "对方"}
-            </span>
-          </div>
-          {detail.affinity != null && (
-            <div className="admin-affinity-hero">
-              <span>对方对你的好感度</span>
-              <strong>{detail.affinity}</strong>
-            </div>
-          )}
-        </div>
-        {dims.length > 0 && (
-          <div className="admin-dims">
-            {dims.map((d, i) => (
-              <div key={d.key || i} className="admin-dim">
-                <span>{d.label || d.key}</span>
-                <strong>{d.value ?? "—"}</strong>
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="admin-chat">
-          {detail.messages.map((m) => (
-            <div
-              key={m.id}
-              className={`admin-bubble-row ${m.sender === "self" ? "self" : "other"}`}
-            >
-              <div className="admin-bubble">
-                <span className="admin-bubble-who">
-                  {m.sender === "self" ? "我" : "对方"}
-                </span>
-                {m.timestamp && (
-                  <time className="admin-bubble-time">{m.timestamp}</time>
-                )}
-                <p>{m.text}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </main>
+      <Replay
+        detail={detail}
+        onBack={() => setDetail(null)}
+        onUpdate={setDetail}
+      />
     );
   }
 
   return (
-    <main className="app admin-app">
-      <header className="admin-head">
-        <div className="admin-head-title">
-          <strong>管理后台</strong>
-          <span>
-            {user?.username} · {tab === "chats" ? `对话 ${total}` : `兑换码 ${codes.length}`}
+    <main className="app">
+      <div className="workspace">
+      <header className="grok-head">
+        <span className="float-circle" aria-hidden="true" />
+        <div className="title-pill">
+          <span className="title-logo">
+            <HeartMark />
+          </span>
+          <span className="title-text">
+            {tab === "chats" ? `对话 ${total}` : `兑换码 ${codes.length}`}
           </span>
         </div>
-        <div className="admin-head-actions">
+        <div className="head-right">
           <button
             type="button"
             className="float-circle"
@@ -381,6 +613,7 @@ export default function AdminApp() {
           </a>
         </div>
       </header>
+      <div className="chat-scroll admin-panel">
 
       <div className="admin-tabs" role="tablist">
         <button
@@ -497,9 +730,9 @@ export default function AdminApp() {
                   <div className="admin-list-body">
                     <div className="admin-list-main">
                       <strong>{item.username}</strong>
-                      <span className="admin-chip">{relationLabel(item.relation)}</span>
+                      <span className="admin-relation-chip">{relationLabel(item.relation)}</span>
                       {item.affinity != null && (
-                        <span className="admin-affinity-pill">{item.affinity}</span>
+                        <span className="admin-list-badge">{item.affinity}</span>
                       )}
                     </div>
                     <div className="admin-list-sub">
@@ -529,6 +762,8 @@ export default function AdminApp() {
           </ul>
         </>
       )}
+      </div>
+      </div>
     </main>
   );
 }
