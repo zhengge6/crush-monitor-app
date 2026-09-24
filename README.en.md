@@ -25,7 +25,7 @@
 > Analysis continues to use [**Jev**](https://typesafe.ai/blog/introducing-system-one-models-and-jev) from TypeSafe for structured emotion / intent / affinity judgments.  
 > Original copyright remains with the upstream authors. This repo adds product UI, trial/redeem, auth, and admin under the same MIT license. See [NOTICE](NOTICE) and [LICENSE](LICENSE).
 
-**Topics:** `jev` · `typesafe` · `crush-monitor` · `wechat` · `chat-analysis` · `affinity` · `sentiment-analysis`
+**Topics:** `jev` · `jev-chat` · `typesafe` · `crush-monitor` · `wechat` · `chat-analysis` · `affinity` · `sentiment-analysis`
 
 ---
 

@@ -25,7 +25,7 @@
 > 核心分析能力继续使用 [**Jev**](https://typesafe.ai/blog/introducing-system-one-models-and-jev)（TypeSafe）做结构化情绪 / 意图 / 好感判断。  
 > 原作版权归原作者所有；本仓库在保留 MIT 许可的前提下扩展了产品化 UI、试用兑换、账号与管理后台等能力。详见 [NOTICE](NOTICE)、[LICENSE](LICENSE)。
 
-**Topics:** `jev` · `typesafe` · `crush-monitor` · `wechat` · `chat-analysis` · `affinity` · `sentiment-analysis`
+**Topics:** `jev` · `jev-chat` · `typesafe` · `crush-monitor` · `wechat` · `chat-analysis` · `affinity` · `sentiment-analysis`
 
 ---
 
