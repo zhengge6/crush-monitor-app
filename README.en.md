@@ -16,11 +16,19 @@
   <a href="README.md"><img src="https://img.shields.io/badge/Docs-中文-6b7280?style=flat-square" alt="Chinese" /></a>
 </p>
 
+
+> **Attribution**  
+> This project is a derivative of [**Crush Monitor**](https://github.com/FerryCorleone/crush-monitor) by [@FerryCorleone](https://github.com/FerryCorleone) (MIT).  
+> Analysis continues to use [**Jev**](https://typesafe.ai/blog/introducing-system-one-models-and-jev) from TypeSafe for structured emotion / intent / affinity judgments.  
+> Original copyright remains with the upstream authors. This repo adds product UI, trial/redeem, auth, and admin under the same MIT license. See [NOTICE](NOTICE) and [LICENSE](LICENSE).
+
+**Topics:** `jev` · `typesafe` · `crush-monitor` · `wechat` · `chat-analysis` · `affinity` · `sentiment-analysis`
+
 ---
 
 ## Overview
 
-**Affinity Analysis** helps you read a two-person chat. Paste the transcript, choose a relation context (crush, friend/colleague, social interaction, …), and get a structured read: signals of how the other person may feel about you, emotion/intent tags, and a chat-style UI for follow-up questions.
+**Affinity Analysis** (crush-monitor-app) is a WeChat chat affinity analyzer powered by **Jev**. Paste the transcript, choose a relation context (crush, friend/colleague, social interaction, …), and get a structured read: signals of how the other person may feel about you, emotion/intent tags, and a chat-style UI for follow-up questions.
 
 Treat the output as a reference, not a verdict. The model cannot see offline context.
 
@@ -109,9 +117,16 @@ deploy/       install + unit file
 - Model output is inference, not psychology and not proof of someone’s feelings.
 - Chat text is sent to your configured provider; usage bills your key.
 - Trial / synced records may live on the server for admin review.
-- Evolved from the open-source Crush Monitor line into this product-shaped affinity analyzer.
+- MIT derivative of [FerryCorleone/crush-monitor](https://github.com/FerryCorleone/crush-monitor). Thanks to [@FerryCorleone](https://github.com/FerryCorleone) and Jev / TypeSafe.
+
+## Credits
+
+- Upstream: [Crush Monitor](https://github.com/FerryCorleone/crush-monitor) by [@FerryCorleone](https://github.com/FerryCorleone)
+- Model: [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) by [TypeSafe](https://typesafe.ai/)
+- If this repo helped you discover the idea, please also star the original.
 
 ## License
+
 
 [MIT](LICENSE)
 

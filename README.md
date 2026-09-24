@@ -16,11 +16,19 @@
   <a href="README.en.md"><img src="https://img.shields.io/badge/Docs-English-6b7280?style=flat-square" alt="English" /></a>
 </p>
 
+
+> **二开说明 / Attribution**  
+> 本项目基于 [@FerryCorleone](https://github.com/FerryCorleone) 的开源项目 [**Crush 好感监控器**](https://github.com/FerryCorleone/crush-monitor)（MIT）二次开发。  
+> 核心分析能力继续使用 [**Jev**](https://typesafe.ai/blog/introducing-system-one-models-and-jev)（TypeSafe）做结构化情绪 / 意图 / 好感判断。  
+> 原作版权归原作者所有；本仓库在保留 MIT 许可的前提下扩展了产品化 UI、试用兑换、账号与管理后台等能力。详见 [NOTICE](NOTICE)、[LICENSE](LICENSE)。
+
+**Topics:** `jev` · `typesafe` · `crush-monitor` · `wechat` · `chat-analysis` · `affinity` · `sentiment-analysis`
+
 ---
 
 ## 这是什么
 
-**好感度分析**是一款面向两人聊天的关系辅助工具。你导入聊天文本后，它会按选定的关系类型（暧昧 / 朋友同事 / 社交互动等）给出结构化解读：对方对你的好感信号、情绪与意图标签，以及可继续追问的对话式界面。
+**好感度分析**（crush-monitor-app）是一款面向两人聊天的关系辅助工具，基于 Jev 做微信聊天情绪、意图与好感度分析。你导入聊天文本后，它会按选定的关系类型（暧昧 / 朋友同事 / 社交互动等）给出结构化解读：对方对你的好感信号、情绪与意图标签，以及可继续追问的对话式界面。
 
 它适合做参考，不适合替你做判断。模型看不到线下相处，也读不懂聊天之外的故事。
 
@@ -154,11 +162,18 @@ deploy/       安装与服务单元
 - 分析结果是模型推断，不是心理测量，更不是对方真实心意的证明。  
 - 聊天原文会发往你配置的模型服务商；用量由你的 Key 承担。  
 - 试玩与同步记录可能落在服务端，便于管理查看；请勿导入高度敏感内容。  
-- 本项目基于开源 Crush Monitor 能力演进，面向「好感度分析」产品形态做了 UI、门禁与后台扩展。
+- 本项目是 [FerryCorleone/crush-monitor](https://github.com/FerryCorleone/crush-monitor) 的 MIT 二开版本，感谢原作者 [@FerryCorleone](https://github.com/FerryCorleone) 与 Jev / TypeSafe。
 
 ---
 
+## 致谢
+
+- 原作：[Crush 好感监控器](https://github.com/FerryCorleone/crush-monitor) by [@FerryCorleone](https://github.com/FerryCorleone)
+- 模型：[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) by [TypeSafe](https://typesafe.ai/)
+- 若你是从本仓库认识这个方向的，也请给原仓库一个 Star。
+
 ## License
+
 
 [MIT](LICENSE)
 

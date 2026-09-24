@@ -1,0 +1,18 @@
+好感度分析 / crush-monitor-app
+================================
+
+This repository is a derivative work of:
+
+  Crush 好感监控器 (crush-monitor)
+  https://github.com/FerryCorleone/crush-monitor
+  Author: FerryCorleone
+  License: MIT
+
+Upstream uses the Jev structured judgment model from TypeSafe:
+  https://typesafe.ai/
+
+Substantial modifications in this repository (zhengge6) include, but are not
+limited to: product-oriented WeChat-style UI, relation scenarios, trial/redeem
+gates, account auth, conversation sync, and an admin console.
+
+The original copyright and MIT license terms are preserved. See LICENSE.
