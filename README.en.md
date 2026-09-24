@@ -29,13 +29,15 @@ Treat the output as a reference, not a verdict. The model cannot see offline con
 ## Screenshots
 
 <p align="center">
-  <img src="docs/assets/shot-home.png" alt="Home" width="220" />
+  <img src="docs/assets/shot-home.png" alt="Home" width="200" />
   &nbsp;&nbsp;
-  <img src="docs/assets/shot-import.png" alt="Import" width="220" />
+  <img src="docs/assets/shot-import.png" alt="Import" width="200" />
+  &nbsp;&nbsp;
+  <img src="docs/assets/shot-demo.png" alt="Demo analysis Sun Yuchen x Jing Tian" width="200" />
 </p>
 
 <p align="center">
-  <sub>Home & relation picker　　·　　Import & identity</sub>
+  <sub>Home　　·　　Import　　·　　Demo analysis (Sun Yuchen × Jing Tian)</sub>
 </p>
 
 ---

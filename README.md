@@ -29,13 +29,15 @@
 ## 产品截图
 
 <p align="center">
-  <img src="docs/assets/shot-home.png" alt="首页与关系选择" width="220" />
+  <img src="docs/assets/shot-home.png" alt="首页与关系选择" width="200" />
   &nbsp;&nbsp;
-  <img src="docs/assets/shot-import.png" alt="导入与身份确认" width="220" />
+  <img src="docs/assets/shot-import.png" alt="导入与身份确认" width="200" />
+  &nbsp;&nbsp;
+  <img src="docs/assets/shot-demo.png" alt="孙宇晨×景甜示例分析" width="200" />
 </p>
 
 <p align="center">
-  <sub>首页与关系选择　　·　　导入与身份确认</sub>
+  <sub>首页　　·　　导入确认　　·　　示例分析（孙宇晨 × 景甜）</sub>
 </p>
 
 ---
