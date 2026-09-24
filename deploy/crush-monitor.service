@@ -1,0 +1,18 @@
+[Unit]
+Description=Crush Monitor (WeChat chat affinity analyzer)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/crush-monitor
+EnvironmentFile=-/opt/crush-monitor/.env
+# Serves Vite build from ./dist and API on PORT (default 3178)
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+RestartSec=5
+User=root
+# Harden lightly; Node needs home for npm cache if first run
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
