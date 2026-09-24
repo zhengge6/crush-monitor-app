@@ -1,4 +1,4 @@
-# 好感度分析
+# jev-crush
 
 <p align="center">
   <img src="docs/assets/logo.png" alt="好感度分析" width="96" />
@@ -57,8 +57,8 @@ Relation context changes the rubric: crush, friend or colleague, social chat. A 
 Node.js 22.12 or newer.
 
 ```bash
-git clone https://github.com/zhengge6/haogan.git
-cd haogan
+git clone https://github.com/zhengge6/jev-crush.git
+cd jev-crush
 npm ci
 cp .env.example .env
 ```
