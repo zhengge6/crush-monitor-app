@@ -14,6 +14,9 @@
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License" />
   <a href="README.md"><img src="https://img.shields.io/badge/Docs-中文-6b7280?style=flat-square" alt="Chinese" /></a>
+  <a href="https://github.com/FerryCorleone/crush-monitor"><img src="https://img.shields.io/badge/Based%20on-Crush%20Monitor-ff6b6b?style=flat-square" alt="Based on Crush Monitor" /></a>
+  <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev"><img src="https://img.shields.io/badge/Powered%20by-Jev-7c3aed?style=flat-square" alt="Powered by Jev" /></a>
+  <img src="https://img.shields.io/github/stars/zhengge6/crush-monitor-app?style=flat-square" alt="Stars" />
 </p>
 
 
