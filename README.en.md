@@ -1,16 +1,15 @@
 # Affinity Analysis (好感度分析)
 
 <p align="center">
-  <img src="docs/assets/01-home.png" alt="Home" width="320" />
+  <img src="docs/assets/logo.png" alt="Logo" width="96" />
 </p>
 
 <p align="center">
   <b>Turn chat history into readable relationship signals</b><br/>
-  Import WeChat chats · pick a relation type · estimate how they feel about you · review runs in admin
+  Import WeChat chats · pick a relation type · estimate how they feel about you
 </p>
 
 <p align="center">
-  <a href="http://118.190.99.36:3178/"><img src="https://img.shields.io/badge/Demo-Live-111111?style=flat-square" alt="Demo" /></a>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D22.12-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node" />
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License" />
@@ -25,15 +24,19 @@
 
 Treat the output as a reference, not a verdict. The model cannot see offline context.
 
-**Live demo:** [http://118.190.99.36:3178/](http://118.190.99.36:3178/)
-
 ---
 
 ## Screenshots
 
-| Home | Import / identity | Admin |
-| :---: | :---: | :---: |
-| <img src="docs/assets/01-home.png" width="240" alt="Home" /> | <img src="docs/assets/02-import.png" width="240" alt="Import" /> | <img src="docs/assets/03-admin.png" width="240" alt="Admin" /> |
+<p align="center">
+  <img src="docs/assets/shot-home.png" alt="Home" width="220" />
+  &nbsp;&nbsp;
+  <img src="docs/assets/shot-import.png" alt="Import" width="220" />
+</p>
+
+<p align="center">
+  <sub>Home & relation picker　　·　　Import & identity</sub>
+</p>
 
 ---
 
@@ -57,7 +60,7 @@ git clone https://github.com/zhengge6/crush-monitor-app.git
 cd crush-monitor-app
 npm ci
 cp .env.example .env
-# set JEV_API_KEY (and other secrets) in .env
+# set JEV_API_KEY in .env
 npm run build
 npm start
 ```
@@ -93,7 +96,7 @@ React 19 · TypeScript · Vite · Express 5 · Zod · Jev · local JSON storage 
 src/          frontend
 server/       API (analyze, auth, redeem, sync, admin)
 shared/       shared types & scoring
-docs/assets/  README screenshots
+docs/assets/  logo & screenshots
 deploy/       install + unit file
 ```
 
@@ -103,7 +106,7 @@ deploy/       install + unit file
 
 - Model output is inference, not psychology and not proof of someone’s feelings.
 - Chat text is sent to your configured provider; usage bills your key.
-- Trial / synced records may live on the server for admin review. Avoid highly sensitive chats on the public demo.
+- Trial / synced records may live on the server for admin review.
 - Evolved from the open-source Crush Monitor line into this product-shaped affinity analyzer.
 
 ## License
